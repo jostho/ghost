@@ -1,0 +1,16 @@
+[package]
+name = "ghost"
+description = "echo server"
+version = "0.1.0"
+authors = ["Jose Thomas <jostho@gmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+tokio = { version = "0.2", features = ["macros"] }
+warp = "0.2"
+http = "0.2"
+rand = "0.7"
+clap = "2.33.0"
+pretty_env_logger = "0.4"
