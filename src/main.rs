@@ -1,3 +1,4 @@
+use std::str;
 use std::thread;
 use std::time::Duration;
 use warp::Filter;
@@ -5,6 +6,7 @@ use http::Response;
 use clap::{App, Arg};
 use rand::{thread_rng, Rng};
 use rand::distributions::Alphanumeric;
+use bytes;
 
 const ARG_PORT: &str = "port";
 const ARG_LOCAL: &str = "local";
@@ -88,8 +90,18 @@ async fn main() {
                 .body(format!("millis: {}", millis))
         });
 
+    // POST /api/post
+    let api_post = warp::path!("api" / "post")
+        .and(warp::post())
+        .and(warp::body::bytes())
+        .map(|bytes: bytes::Bytes| {
+            Response::builder()
+                .body(format!("{}", str::from_utf8(&bytes).unwrap_or("")))
+        });
+
     let routes = healthcheck.or(version)
         .or(api_status).or(api_bytes).or(api_sleep)
+        .or(api_post)
         .with(warp::log(clap::crate_name!()));
     warp::serve(routes).run((interface, port)).await;
 }

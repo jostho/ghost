@@ -318,6 +318,7 @@ dependencies = [
 name = "ghost"
 version = "0.1.0"
 dependencies = [
+ "bytes",
  "clap",
  "http",
  "pretty_env_logger",
