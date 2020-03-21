@@ -42,13 +42,18 @@ async fn main() {
     }
 
     // GET /healthcheck
-    let healthcheck = warp::path("healthcheck").map(|| "Ok");
+    let healthcheck = warp::path("healthcheck")
+        .and(warp::get())
+        .map(|| "Ok");
 
     // GET /version
-    let version = warp::path("version").map(|| clap::crate_version!());
+    let version = warp::path("version")
+        .and(warp::get())
+        .map(|| clap::crate_version!());
 
     // GET /api/status/:u16
     let api_status = warp::path!("api" / "status" / u16)
+        .and(warp::get())
         .map(|code: u16| {
             let mut response_code = 200;
             if code > 200 && code < 600 {
@@ -62,6 +67,7 @@ async fn main() {
 
     // GET /api/bytes/:u16
     let api_bytes = warp::path!("api" / "bytes" / u16)
+        .and(warp::get())
         .map(|num_bytes: u16| {
             let rand_string: String = thread_rng()
                 .sample_iter(&Alphanumeric)
@@ -74,6 +80,7 @@ async fn main() {
 
     // GET /api/sleep/:u16
     let api_sleep = warp::path!("api" / "sleep" / u16)
+        .and(warp::get())
         .map(|millis: u16| {
             thread::sleep(Duration::from_millis(millis as u64));
             Response::builder()
