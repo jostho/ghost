@@ -11,6 +11,7 @@ use bytes;
 const ARG_PORT: &str = "port";
 const ARG_LOCAL: &str = "local";
 const INPUT_HEADER: &str = "X-Ghost-Input";
+const HEADER_CONTENT_TYPE: &str = "Content-Type";
 
 #[tokio::main]
 async fn main() {
@@ -93,9 +94,11 @@ async fn main() {
     // POST /api/post
     let api_post = warp::path!("api" / "post")
         .and(warp::post())
+        .and(warp::header::<String>(HEADER_CONTENT_TYPE))
         .and(warp::body::bytes())
-        .map(|bytes: bytes::Bytes| {
+        .map(|content_type: String, bytes: bytes::Bytes| {
             Response::builder()
+                .header(HEADER_CONTENT_TYPE, content_type)
                 .body(format!("{}", str::from_utf8(&bytes).unwrap_or("")))
         });
 
