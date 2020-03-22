@@ -99,7 +99,7 @@ async fn main() {
         .map(|content_type: String, bytes: bytes::Bytes| {
             Response::builder()
                 .header(HEADER_CONTENT_TYPE, content_type)
-                .body(format!("{}", str::from_utf8(&bytes).unwrap_or("")))
+                .body(str::from_utf8(&bytes).unwrap_or("").to_string())
         });
 
     let routes = healthcheck
