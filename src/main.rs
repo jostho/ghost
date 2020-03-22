@@ -1,12 +1,12 @@
+use bytes;
+use clap::{App, Arg};
+use http::Response;
+use rand::distributions::Alphanumeric;
+use rand::{thread_rng, Rng};
 use std::str;
 use std::thread;
 use std::time::Duration;
 use warp::Filter;
-use http::Response;
-use clap::{App, Arg};
-use rand::{thread_rng, Rng};
-use rand::distributions::Alphanumeric;
-use bytes;
 
 const ARG_PORT: &str = "port";
 const ARG_LOCAL: &str = "local";
@@ -23,15 +23,15 @@ async fn main() {
         .version(clap::crate_version!())
         .arg(
             Arg::with_name(ARG_PORT)
-            .long(ARG_PORT)
-            .help("Port number to use")
-            .default_value("8080")
+                .long(ARG_PORT)
+                .help("Port number to use")
+                .default_value("8080"),
         )
         .arg(
             Arg::with_name(ARG_LOCAL)
-            .long(ARG_LOCAL)
-            .help("bind on local interface")
-            .takes_value(false)
+                .long(ARG_LOCAL)
+                .help("bind on local interface")
+                .takes_value(false),
         )
         .get_matches();
 
@@ -46,9 +46,7 @@ async fn main() {
     }
 
     // GET /healthcheck
-    let healthcheck = warp::path("healthcheck")
-        .and(warp::get())
-        .map(|| "Ok");
+    let healthcheck = warp::path("healthcheck").and(warp::get()).map(|| "Ok");
 
     // GET /version
     let version = warp::path("version")
@@ -104,8 +102,11 @@ async fn main() {
                 .body(format!("{}", str::from_utf8(&bytes).unwrap_or("")))
         });
 
-    let routes = healthcheck.or(version)
-        .or(api_status).or(api_bytes).or(api_sleep)
+    let routes = healthcheck
+        .or(version)
+        .or(api_status)
+        .or(api_bytes)
+        .or(api_sleep)
         .or(api_post)
         .with(warp::log(clap::crate_name!()));
     warp::serve(routes).run((interface, port)).await;
