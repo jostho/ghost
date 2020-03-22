@@ -10,7 +10,7 @@ use bytes;
 
 const ARG_PORT: &str = "port";
 const ARG_LOCAL: &str = "local";
-const INPUT_HEADER: &str = "X-Ghost-Input";
+const HEADER_INPUT: &str = "X-Ghost-Input";
 const HEADER_CONTENT_TYPE: &str = "Content-Type";
 
 #[tokio::main]
@@ -64,7 +64,7 @@ async fn main() {
             }
             Response::builder()
                 .status(response_code)
-                .header(INPUT_HEADER, code.to_string())
+                .header(HEADER_INPUT, code.to_string())
                 .body(format!("status: {}", response_code))
         });
 
@@ -77,7 +77,7 @@ async fn main() {
                 .take(num_bytes as usize)
                 .collect();
             Response::builder()
-                .header(INPUT_HEADER, num_bytes.to_string())
+                .header(HEADER_INPUT, num_bytes.to_string())
                 .body(rand_string)
         });
 
@@ -87,7 +87,7 @@ async fn main() {
         .map(|millis: u16| {
             thread::sleep(Duration::from_millis(millis as u64));
             Response::builder()
-                .header(INPUT_HEADER, millis.to_string())
+                .header(HEADER_INPUT, millis.to_string())
                 .body(format!("millis: {}", millis))
         });
 
