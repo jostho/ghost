@@ -12,6 +12,7 @@ const ARG_PORT: &str = "port";
 const ARG_LOCAL: &str = "local";
 const HEADER_INPUT: &str = "X-Ghost-Input";
 const HEADER_CONTENT_TYPE: &str = "Content-Type";
+const CONTENT_LENGTH_LIMIT: u64 = 1024 * 64;
 
 #[tokio::main]
 async fn main() {
@@ -95,6 +96,7 @@ async fn main() {
     let api_post = warp::path!("api" / "post")
         .and(warp::post())
         .and(warp::header::<String>(HEADER_CONTENT_TYPE))
+        .and(warp::body::content_length_limit(CONTENT_LENGTH_LIMIT))
         .and(warp::body::bytes())
         .map(|content_type: String, bytes: bytes::Bytes| {
             Response::builder()
