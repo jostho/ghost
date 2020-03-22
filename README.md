@@ -1,11 +1,12 @@
 # Ghost
 
-This is an echo server written in rust. This can be used to simulate http responses.
+This is an echo server written in rust using [warp](https://github.com/seanmonstar/warp).
+This can be used to simulate http responses.
 
 ## Environment
 
 * fedora 31
-* cargo 1.42
+* rust 1.42
 
 ## Build
 
