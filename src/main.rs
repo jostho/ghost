@@ -13,6 +13,7 @@ const ARG_LOCAL: &str = "local";
 const HEADER_INPUT: &str = "X-Ghost-Input";
 const HEADER_CONTENT_TYPE: &str = "Content-Type";
 const CONTENT_LENGTH_LIMIT: u64 = 1024 * 64;
+const MAX_PORT: u16 = 32768;
 
 #[tokio::main]
 async fn main() {
@@ -25,7 +26,8 @@ async fn main() {
             Arg::with_name(ARG_PORT)
                 .long(ARG_PORT)
                 .help("Port number to use")
-                .default_value("8000"),
+                .default_value("8000")
+                .validator(is_valid_port),
         )
         .arg(
             Arg::with_name(ARG_LOCAL)
@@ -37,7 +39,7 @@ async fn main() {
 
     // decide port
     let port = args.value_of(ARG_PORT).unwrap();
-    let port = port.parse().unwrap_or(8000);
+    let port = port.parse().unwrap();
 
     // decide interface
     let mut interface = [0, 0, 0, 0]; // default
@@ -110,4 +112,17 @@ async fn main() {
         .or(api_post)
         .with(warp::log(clap::crate_name!()));
     warp::serve(routes).run((interface, port)).await;
+}
+
+fn is_valid_port(val: String) -> Result<(), String> {
+    let port: u16 = match val.parse() {
+        Ok(port) => port,
+        Err(e) => return Err(e.to_string()),
+    };
+
+    if port < MAX_PORT {
+        Ok(())
+    } else {
+        Err(format!("Value should be less than {}", MAX_PORT))
+    }
 }
