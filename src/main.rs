@@ -25,19 +25,19 @@ async fn main() {
             Arg::with_name(ARG_PORT)
                 .long(ARG_PORT)
                 .help("Port number to use")
-                .default_value("8080"),
+                .default_value("8000"),
         )
         .arg(
             Arg::with_name(ARG_LOCAL)
                 .long(ARG_LOCAL)
-                .help("bind on local interface")
+                .help("Bind on local interface")
                 .takes_value(false),
         )
         .get_matches();
 
     // decide port
     let port = args.value_of(ARG_PORT).unwrap();
-    let port = port.parse().unwrap_or(8080);
+    let port = port.parse().unwrap_or(8000);
 
     // decide interface
     let mut interface = [0, 0, 0, 0]; // default
