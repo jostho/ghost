@@ -126,3 +126,20 @@ fn is_valid_port(val: String) -> Result<(), String> {
         Err(format!("Value should be less than {}", MAX_PORT))
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[tokio::test]
+    async fn healthcheck() {
+        let healthcheck = warp::path("healthcheck").and(warp::get()).map(|| "Ok");
+        let resp = warp::test::request()
+            .path("/healthcheck")
+            .reply(&healthcheck)
+            .await;
+
+        assert_eq!(resp.status(), 200);
+        assert_eq!(resp.body(), "Ok");
+    }
+}
