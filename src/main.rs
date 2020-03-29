@@ -42,10 +42,11 @@ async fn main() {
     let port = port.parse().unwrap();
 
     // decide interface
-    let mut interface = [0, 0, 0, 0]; // default
-    if args.is_present(ARG_LOCAL) {
-        interface = [127, 0, 0, 1];
-    }
+    let interface = if args.is_present(ARG_LOCAL) {
+        [127, 0, 0, 1]
+    } else {
+        [0, 0, 0, 0] // default
+    };
 
     // GET /healthcheck
     let healthcheck = warp::path("healthcheck").and(warp::get()).map(|| "Ok");
@@ -65,10 +66,7 @@ async fn main() {
     let api_status = warp::path!("status" / u16)
         .and(warp::get())
         .map(|code: u16| {
-            let mut response_code = 200;
-            if code > 200 && code < 600 {
-                response_code = code;
-            }
+            let response_code = if code > 200 && code < 600 { code } else { 200 };
             Response::builder()
                 .status(response_code)
                 .header(HEADER_INPUT, code.to_string())
