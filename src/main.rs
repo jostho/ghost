@@ -55,8 +55,14 @@ async fn main() {
         .and(warp::get())
         .map(|| clap::crate_version!());
 
+    // GET /api
+    let api_root = warp::path!("api" / ..);
+    let api_help = warp::get()
+        .and(warp::path::end())
+        .map(|| "Welcome to the API");
+
     // GET /api/status/:u16
-    let api_status = warp::path!("api" / "status" / u16)
+    let api_status = warp::path!("status" / u16)
         .and(warp::get())
         .map(|code: u16| {
             let mut response_code = 200;
@@ -70,7 +76,7 @@ async fn main() {
         });
 
     // GET /api/bytes/:u16
-    let api_bytes = warp::path!("api" / "bytes" / u16)
+    let api_bytes = warp::path!("bytes" / u16)
         .and(warp::get())
         .map(|num_bytes: u16| {
             let rand_string: String = thread_rng()
@@ -83,7 +89,7 @@ async fn main() {
         });
 
     // GET /api/sleep/:u16
-    let api_sleep = warp::path!("api" / "sleep" / u16)
+    let api_sleep = warp::path!("sleep" / u16)
         .and(warp::get())
         .map(|millis: u16| {
             thread::sleep(Duration::from_millis(millis as u64));
@@ -93,7 +99,7 @@ async fn main() {
         });
 
     // POST /api/post
-    let api_post = warp::path!("api" / "post")
+    let api_post = warp::path!("post")
         .and(warp::post())
         .and(warp::header::<String>(HEADER_CONTENT_TYPE))
         .and(warp::body::content_length_limit(CONTENT_LENGTH_LIMIT))
@@ -104,12 +110,16 @@ async fn main() {
                 .body(str::from_utf8(&bytes).unwrap_or("").to_string())
         });
 
+    let api = api_root.and(
+        api_help
+            .or(api_status)
+            .or(api_bytes)
+            .or(api_sleep)
+            .or(api_post),
+    );
     let routes = healthcheck
         .or(version)
-        .or(api_status)
-        .or(api_bytes)
-        .or(api_sleep)
-        .or(api_post)
+        .or(api)
         .with(warp::log(clap::crate_name!()));
     warp::serve(routes).run((interface, port)).await;
 }
