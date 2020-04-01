@@ -7,12 +7,17 @@ JQ := /usr/bin/jq
 
 TARGET := $(CURDIR)/target/release
 
+GIT_BRANCH := $(shell $(GIT) rev-parse --abbrev-ref HEAD)
 GIT_COMMIT := $(shell $(GIT) rev-parse --short HEAD)
+GIT_VERSION := $(GIT_BRANCH)/$(GIT_COMMIT)
+
 APP_NAME := $(shell $(CARGO) read-manifest | $(JQ) -r .name)
 APP_VERSION := $(shell $(CARGO) read-manifest | $(JQ) -r .version)
 
-CONTAINER := $(APP_NAME)-ubi-container-1
-BASE_IMAGE := registry.access.redhat.com/ubi8/ubi-minimal:latest
+UBI_TYPE := ubi8/ubi-minimal
+BASE_IMAGE := registry.access.redhat.com/$(UBI_TYPE):latest
+
+CONTAINER := $(APP_NAME)-ubi-minimal-container-1
 IMAGE_NAME := jostho/$(APP_NAME):v$(APP_VERSION)
 IMAGE_BINARY_PATH := /usr/local/bin/$(APP_NAME)
 PORT := 8000
@@ -34,7 +39,8 @@ build-image:
 	$(BUILDAH) copy $(CONTAINER) $(TARGET)/$(APP_NAME) $(IMAGE_BINARY_PATH)
 	$(BUILDAH) config \
 		--cmd $(IMAGE_BINARY_PATH) --port $(PORT) \
-		-l Name=$(APP_NAME) -l Version=$(APP_VERSION) -l Commit=$(GIT_COMMIT) \
+		-l app-name=$(APP_NAME) -l app-version=$(APP_VERSION) \
+		-l app-git-version=$(GIT_VERSION) -l app-base-image=$(UBI_TYPE) \
 		$(CONTAINER)
 	$(BUILDAH) commit --rm $(CONTAINER) $(IMAGE_NAME)
 
