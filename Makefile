@@ -1,11 +1,10 @@
 # tested with make 4.2.1
 
+# required binaries
 CARGO := /usr/bin/cargo
 BUILDAH := /usr/bin/buildah
 GIT := /usr/bin/git
 JQ := /usr/bin/jq
-
-TARGET := $(CURDIR)/target/release
 
 GIT_BRANCH := $(shell $(GIT) rev-parse --abbrev-ref HEAD)
 GIT_COMMIT := $(shell $(GIT) rev-parse --short HEAD)
@@ -14,13 +13,15 @@ GIT_VERSION := $(GIT_BRANCH)/$(GIT_COMMIT)
 APP_NAME := $(shell $(CARGO) read-manifest | $(JQ) -r .name)
 APP_VERSION := $(shell $(CARGO) read-manifest | $(JQ) -r .version)
 
-UBI_TYPE := ubi8/ubi-minimal
+UBI_TYPE := ubi8-minimal
 BASE_IMAGE := registry.access.redhat.com/$(UBI_TYPE):latest
 
-CONTAINER := $(APP_NAME)-ubi-minimal-container-1
+CONTAINER := $(APP_NAME)-$(UBI_TYPE)-container-1
 IMAGE_NAME := jostho/$(APP_NAME):v$(APP_VERSION)
 IMAGE_BINARY_PATH := /usr/local/bin/$(APP_NAME)
 PORT := 8000
+
+TARGET := $(CURDIR)/target/release
 
 check:
 	$(CARGO) --version
