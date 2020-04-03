@@ -5,6 +5,7 @@ CARGO := /usr/bin/cargo
 BUILDAH := /usr/bin/buildah
 GIT := /usr/bin/git
 JQ := /usr/bin/jq
+PODMAN := /usr/bin/podman
 
 GIT_BRANCH := $(shell $(GIT) rev-parse --abbrev-ref HEAD)
 GIT_COMMIT := $(shell $(GIT) rev-parse --short HEAD)
@@ -28,6 +29,7 @@ check:
 	$(BUILDAH) --version
 	$(GIT) --version
 	$(JQ) --version
+	$(PODMAN) --version
 
 clean:
 	rm -rf $(TARGET)
