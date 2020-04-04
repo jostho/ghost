@@ -17,7 +17,7 @@ APP_VERSION := $(shell $(CARGO) read-manifest | $(JQ) -r .version)
 UBI_TYPE := ubi8-minimal
 BASE_IMAGE := registry.access.redhat.com/$(UBI_TYPE):latest
 
-CONTAINER := $(APP_NAME)-$(UBI_TYPE)-container-1
+CONTAINER := $(APP_NAME)-$(UBI_TYPE)-build-1
 IMAGE_NAME := jostho/$(APP_NAME):v$(APP_VERSION)
 IMAGE_BINARY_PATH := /usr/local/bin/$(APP_NAME)
 PORT := 8000
@@ -41,7 +41,8 @@ build-image:
 	$(BUILDAH) from --name $(CONTAINER) $(BASE_IMAGE)
 	$(BUILDAH) copy $(CONTAINER) $(TARGET)/$(APP_NAME) $(IMAGE_BINARY_PATH)
 	$(BUILDAH) config \
-		--cmd $(IMAGE_BINARY_PATH) --port $(PORT) \
+		--cmd $(IMAGE_BINARY_PATH) \
+		--port $(PORT) \
 		-l app-name=$(APP_NAME) -l app-version=$(APP_VERSION) \
 		-l app-git-version=$(GIT_VERSION) -l app-base-image=$(UBI_TYPE) \
 		$(CONTAINER)
