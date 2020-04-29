@@ -5,8 +5,8 @@ This can be used to simulate http responses.
 
 ## Environment
 
-* fedora 31
-* rust 1.42
+* fedora 32
+* rust 1.43
 * make 4.2
 
 ## Build binary
@@ -30,4 +30,4 @@ To build the container image
 
 To run the container image - use `podman`
 
-    podman run -d -p 8000:8000 <ctrid>
+    podman run -d -p 8000:8000 <imageid>
