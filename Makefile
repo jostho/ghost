@@ -15,7 +15,7 @@ APP_NAME := $(shell $(CARGO) read-manifest | $(JQ) -r .name)
 APP_VERSION := $(shell $(CARGO) read-manifest | $(JQ) -r .version)
 
 UBI_TYPE := ubi8-minimal
-BASE_IMAGE := registry.access.redhat.com/$(UBI_TYPE):latest
+BASE_IMAGE := registry.access.redhat.com/$(UBI_TYPE):8.2
 
 CONTAINER := $(APP_NAME)-$(UBI_TYPE)-build-1
 IMAGE_NAME := jostho/$(APP_NAME):v$(APP_VERSION)
