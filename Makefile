@@ -22,7 +22,7 @@ IMAGE_NAME := jostho/$(APP_NAME):v$(APP_VERSION)
 IMAGE_BINARY_PATH := /usr/local/bin/$(APP_NAME)
 PORT := 8000
 
-TARGET := $(CURDIR)/target/release
+TARGET := $(CURDIR)/target/release/$(APP_NAME)
 
 check:
 	$(CARGO) --version
@@ -32,14 +32,14 @@ check:
 	$(PODMAN) --version
 
 clean:
-	rm -rf $(TARGET)
+	$(CARGO) clean
 
 build:
 	$(CARGO) build --release
 
 build-image:
 	$(BUILDAH) from --name $(CONTAINER) $(BASE_IMAGE)
-	$(BUILDAH) copy $(CONTAINER) $(TARGET)/$(APP_NAME) $(IMAGE_BINARY_PATH)
+	$(BUILDAH) copy $(CONTAINER) $(TARGET) $(IMAGE_BINARY_PATH)
 	$(BUILDAH) config \
 		--cmd $(IMAGE_BINARY_PATH) \
 		--port $(PORT) \
