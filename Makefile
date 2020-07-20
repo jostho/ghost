@@ -1,11 +1,11 @@
 # tested with make 4.2.1
 
 # required binaries
-CARGO := /usr/bin/cargo
-BUILDAH := /usr/bin/buildah
-GIT := /usr/bin/git
-JQ := /usr/bin/jq
-PODMAN := /usr/bin/podman
+CARGO := cargo
+BUILDAH := buildah
+GIT := git
+JQ := jq
+PODMAN := podman
 
 GIT_BRANCH := $(shell $(GIT) rev-parse --abbrev-ref HEAD)
 GIT_COMMIT := $(shell $(GIT) rev-parse --short HEAD)
