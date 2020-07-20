@@ -16,9 +16,13 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Check cargo version
+    - name: Print cargo version
       run: cargo --version
+    - name: Check fmt
+      run: cargo fmt -- --check
     - name: Build
       run: cargo build
     - name: Run tests
       run: cargo test
+    - name: Run make
+      run: make check
