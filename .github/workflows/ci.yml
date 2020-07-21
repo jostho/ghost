@@ -35,3 +35,5 @@ jobs:
       run: make --version
     - name: Run make check
       run: make check
+    - name: Build image
+      run: make image
