@@ -1,4 +1,4 @@
-use bytes;
+use bytes::Bytes;
 use clap::{App, Arg};
 use http::Response;
 use rand::distributions::Alphanumeric;
@@ -102,7 +102,7 @@ async fn main() {
         .and(warp::header::<String>(HEADER_CONTENT_TYPE))
         .and(warp::body::content_length_limit(CONTENT_LENGTH_LIMIT))
         .and(warp::body::bytes())
-        .map(|content_type: String, bytes: bytes::Bytes| {
+        .map(|content_type: String, bytes: Bytes| {
             Response::builder()
                 .header(HEADER_CONTENT_TYPE, content_type)
                 .body(str::from_utf8(&bytes).unwrap_or("").to_string())
