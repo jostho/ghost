@@ -47,6 +47,7 @@ build-image:
 		-l app-git-version=$(GIT_VERSION) -l app-base-image=$(UBI_TYPE) \
 		$(CONTAINER)
 	$(BUILDAH) commit --rm $(CONTAINER) $(IMAGE_NAME)
+	$(BUILDAH) images
 
 clean-image:
 	$(BUILDAH) rmi $(IMAGE_NAME)
