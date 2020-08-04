@@ -8,7 +8,8 @@ This can be used to simulate http responses.
 ## Environment
 
 * fedora 32
-* rust 1.43
+* rustup 1.22
+* rust 1.45
 * make 4.2
 
 ## Build binary
@@ -26,7 +27,7 @@ Check prerequisites to build the image
 
     make check
 
-To build the container image
+To build the default container image
 
     make image
 
