@@ -131,7 +131,7 @@ fn is_valid_port(val: String) -> Result<(), String> {
     if port < MAX_PORT {
         Ok(())
     } else {
-        Err(format!("Value should be less than {}", MAX_PORT))
+        Err(format!("value should be less than {}", MAX_PORT))
     }
 }
 
@@ -139,15 +139,27 @@ fn is_valid_port(val: String) -> Result<(), String> {
 mod tests {
     use super::*;
 
-    #[tokio::test]
-    async fn healthcheck() {
-        let healthcheck = warp::path("healthcheck").and(warp::get()).map(|| "Ok");
-        let resp = warp::test::request()
-            .path("/healthcheck")
-            .reply(&healthcheck)
-            .await;
+    #[test]
+    fn is_valid_port_for_string() {
+        let result = is_valid_port("str".to_string());
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err(), "invalid digit found in string");
+    }
 
-        assert_eq!(resp.status(), 200);
-        assert_eq!(resp.body(), "Ok");
+    #[test]
+    fn is_valid_port_for_8000() {
+        let result = is_valid_port("8000".to_string());
+        assert!(result.is_ok());
+        assert_eq!(result.unwrap(), ());
+    }
+
+    #[test]
+    fn is_valid_port_for_32768() {
+        let result = is_valid_port("32768".to_string());
+        assert!(result.is_err());
+        assert_eq!(
+            result.unwrap_err(),
+            format!("value should be less than {}", MAX_PORT)
+        );
     }
 }
