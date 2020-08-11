@@ -154,8 +154,8 @@ mod tests {
     }
 
     #[test]
-    fn is_valid_port_for_32768() {
-        let result = is_valid_port("32768".to_string());
+    fn is_valid_port_for_max_port() {
+        let result = is_valid_port(MAX_PORT.to_string());
         assert!(result.is_err());
         assert_eq!(
             result.unwrap_err(),
