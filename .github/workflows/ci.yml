@@ -31,6 +31,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - name: Print version
+      run: rustc --version --verbose && cargo --version
     - name: Print make version
       run: make --version
     - name: Run make check
@@ -51,6 +53,8 @@ jobs:
         toolchain: stable
         override: true
         target: x86_64-unknown-linux-musl
+    - name: Print version
+      run: rustc --version --verbose && cargo --version
     - name: Print make version
       run: make --version
     - name: Run make check
