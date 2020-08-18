@@ -12,14 +12,14 @@ This can be used to simulate http responses.
 * rust 1.45
 * make 4.2
 
-## Build binary
+## Build
 
-To build or run, use cargo
+To build or run, use `cargo`
 
     cargo build
     cargo run
 
-## Build image
+## Image
 
 A `Makefile` is provided to build a container image
 
