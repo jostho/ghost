@@ -57,6 +57,7 @@ build-image:
 	$(BUILDAH) config \
 		--cmd $(IMAGE_BINARY_PATH) \
 		--port $(PORT) \
+		--env RUST_LOG=info \
 		-l app-name=$(APP_NAME) -l app-version=$(APP_VERSION) \
 		-l app-git-version=$(GIT_VERSION) -l app-base-image=$(BASE_IMAGE_TYPE) \
 		$(CONTAINER)
