@@ -2,10 +2,10 @@
 
 # required binaries
 CARGO := cargo
+CC := gcc
 BUILDAH := buildah
 GIT := git
 JQ := jq
-PODMAN := podman
 
 GIT_BRANCH := $(shell $(GIT) rev-parse --abbrev-ref HEAD)
 GIT_COMMIT := $(shell $(GIT) rev-parse --short HEAD)
@@ -23,10 +23,10 @@ TARGET_MUSL := x86_64-unknown-linux-musl
 
 check:
 	$(CARGO) --version
+	$(CC) --version | head -1
 	$(BUILDAH) --version
 	$(GIT) --version
 	$(JQ) --version
-	$(PODMAN) --version
 
 clean:
 	$(CARGO) clean
