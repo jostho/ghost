@@ -2,6 +2,7 @@
 
 # required binaries
 CARGO := cargo
+RUSTC := rustc
 CC := gcc
 BUILDAH := buildah
 GIT := git
@@ -23,6 +24,7 @@ TARGET_MUSL := x86_64-unknown-linux-musl
 
 check:
 	$(CARGO) --version
+	$(RUSTC) --version
 	$(CC) --version | head -1
 	$(BUILDAH) --version
 	$(GIT) --version
