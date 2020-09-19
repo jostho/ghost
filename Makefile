@@ -8,6 +8,8 @@ BUILDAH := buildah
 GIT := git
 JQ := jq
 
+ARCH = $(shell arch)
+
 GIT_BRANCH := $(shell $(GIT) rev-parse --abbrev-ref HEAD)
 GIT_COMMIT := $(shell $(GIT) rev-parse --short HEAD)
 GIT_VERSION := $(GIT_BRANCH)/$(GIT_COMMIT)
@@ -20,7 +22,7 @@ UBI_BASE_IMAGE := registry.access.redhat.com/ubi8-minimal:8.2
 IMAGE_BINARY_PATH := /usr/local/bin/$(APP_NAME)
 PORT := 8000
 
-TARGET_MUSL := x86_64-unknown-linux-musl
+TARGET_MUSL := $(ARCH)-unknown-linux-musl
 
 check:
 	$(CARGO) --version
@@ -60,8 +62,11 @@ build-image:
 		--cmd $(IMAGE_BINARY_PATH) \
 		--port $(PORT) \
 		--env RUST_LOG=info \
-		-l app-name=$(APP_NAME) -l app-version=$(APP_VERSION) \
-		-l app-git-version=$(GIT_VERSION) -l app-base-image=$(BASE_IMAGE_TYPE) \
+		-l app-name=$(APP_NAME) \
+		-l app-version=$(APP_VERSION) \
+		-l app-git-version=$(GIT_VERSION) \
+		-l app-arch=$(ARCH) \
+		-l app-base-image=$(BASE_IMAGE_TYPE) \
 		$(CONTAINER)
 	$(BUILDAH) commit --rm $(CONTAINER) $(IMAGE_NAME)
 	$(BUILDAH) images
