@@ -59,14 +59,14 @@ build-image-default: CONTAINER = $(APP_NAME)-$(BASE_IMAGE_TYPE)-build-1
 build-image-default: BASE_IMAGE = $(UBI_BASE_IMAGE)
 build-image-default: IMAGE_NAME = jostho/$(APP_NAME):v$(APP_VERSION)
 build-image-default: LOCAL_BINARY_PATH = $(CURDIR)/target/release/$(APP_NAME)
-build-image-default: prep-version-file build-image
+build-image-default: build-image
 
 build-image-static: BASE_IMAGE_TYPE = scratch
 build-image-static: CONTAINER = $(APP_NAME)-$(BASE_IMAGE_TYPE)-build-1
 build-image-static: BASE_IMAGE = $(BASE_IMAGE_TYPE)
 build-image-static: IMAGE_NAME = jostho/$(APP_NAME)-static:v$(APP_VERSION)
 build-image-static: LOCAL_BINARY_PATH = $(CURDIR)/target/$(TARGET_MUSL)/release/$(APP_NAME)
-build-image-static: prep-version-file build-image
+build-image-static: build-image
 
 build-image:
 	$(BUILDAH) from --name $(CONTAINER) $(BASE_IMAGE)
@@ -85,9 +85,9 @@ build-image:
 	$(BUILDAH) commit --rm $(CONTAINER) $(IMAGE_NAME)
 	$(BUILDAH) images
 
-image: clean build build-image-default
+image: clean build prep-version-file build-image-default
 
-image-static: clean build-static build-image-static
+image-static: clean build-static prep-version-file build-image-static
 
 .PHONY: check check-required check-optional
 .PHONY: clean prep-version-file
