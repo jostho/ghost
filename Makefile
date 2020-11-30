@@ -50,8 +50,11 @@ build:
 build-static:
 	$(CARGO) build --release --target $(TARGET_MUSL)
 
-prep-version-file:
-	mkdir -p $(CURDIR)/target && echo "$(APP_NAME) $(APP_VERSION)" > $(LOCAL_META_VERSION_PATH)
+check-target-dir:
+	test -d $(CURDIR)/target
+
+prep-version-file: check-target-dir
+	echo "$(APP_NAME) $(APP_VERSION)" > $(LOCAL_META_VERSION_PATH)
 	$(MAKE) -s check-required >> $(LOCAL_META_VERSION_PATH)
 
 build-image-default: BASE_IMAGE_TYPE = ubi
@@ -89,7 +92,7 @@ image: clean build prep-version-file build-image-default
 
 image-static: clean build-static prep-version-file build-image-static
 
-.PHONY: check check-required check-optional
+.PHONY: check check-required check-optional check-target-dir
 .PHONY: clean prep-version-file
 .PHONY: build build-static
 .PHONY: build-image-default build-image-static build-image
