@@ -29,6 +29,9 @@ LOCAL_META_VERSION_PATH := $(CURDIR)/target/meta.version
 
 TARGET_MUSL := $(ARCH)-unknown-linux-musl
 
+RUSTC_PRINT_TARGET_CMD := $(RUSTC) -Z unstable-options --print target-spec-json
+JQ_TARGET_CMD := $(JQ) -r '."llvm-target"'
+
 check: check-required check-optional
 
 check-required:
@@ -36,9 +39,9 @@ check-required:
 	$(RUSTC) --version
 	$(CC) --version | head -1
 	$(LDD) --version | head -1
-	$(BUILDAH) --version
 
 check-optional:
+	$(BUILDAH) --version
 	$(GIT) --version
 	$(JQ) --version
 	$(PODMAN) --version
@@ -56,7 +59,7 @@ check-target-dir:
 	test -d $(CURDIR)/target
 
 prep-version-file: check-target-dir
-	echo "$(APP_NAME) $(APP_VERSION)" > $(LOCAL_META_VERSION_PATH)
+	echo "$(APP_NAME) $(APP_VERSION) $(LLVM_TARGET)" > $(LOCAL_META_VERSION_PATH)
 	$(MAKE) -s check-required >> $(LOCAL_META_VERSION_PATH)
 
 build-image-default: BASE_IMAGE_TYPE = ubi
@@ -91,8 +94,10 @@ build-image:
 	$(BUILDAH) images
 	$(PODMAN) run $(IMAGE_NAME) $(IMAGE_BINARY_PATH) --version
 
+image: LLVM_TARGET = $(shell RUSTC_BOOTSTRAP=1 $(RUSTC_PRINT_TARGET_CMD) | $(JQ_TARGET_CMD))
 image: clean build prep-version-file build-image-default
 
+image-static: LLVM_TARGET = $(shell RUSTC_BOOTSTRAP=1 $(RUSTC_PRINT_TARGET_CMD) --target $(TARGET_MUSL) | $(JQ_TARGET_CMD))
 image-static: clean build-static prep-version-file build-image-static
 
 .PHONY: check check-required check-optional check-target-dir
