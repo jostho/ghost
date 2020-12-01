@@ -8,6 +8,7 @@ LDD := ldd
 BUILDAH := buildah
 GIT := git
 JQ := jq
+PODMAN := podman
 
 ARCH = $(shell arch)
 
@@ -40,6 +41,7 @@ check-required:
 check-optional:
 	$(GIT) --version
 	$(JQ) --version
+	$(PODMAN) --version
 
 clean:
 	$(CARGO) clean
@@ -87,6 +89,7 @@ build-image:
 		$(CONTAINER)
 	$(BUILDAH) commit --rm $(CONTAINER) $(IMAGE_NAME)
 	$(BUILDAH) images
+	$(PODMAN) run $(IMAGE_NAME) $(IMAGE_BINARY_PATH) --version
 
 image: clean build prep-version-file build-image-default
 
