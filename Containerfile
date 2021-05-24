@@ -1,9 +1,10 @@
 # rust builder
 FROM docker.io/library/rust:1.52 as builder
+ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get -y -qq update && apt-get -y -qq install jq
 WORKDIR /usr/local/src/ghost
 COPY . /usr/local/src/ghost
-RUN make build-prep-version-file
+RUN make build-prep
 
 # debian buster
 FROM docker.io/library/debian:10.9

@@ -61,8 +61,8 @@ prep-version-file: check-target-dir
 	$(MAKE) -s check-required >> $(LOCAL_META_VERSION_PATH)
 
 # target for Containerfile
-build-prep-version-file: LLVM_TARGET = $(shell RUSTC_BOOTSTRAP=1 $(RUSTC_PRINT_TARGET_CMD) | $(JQ_TARGET_CMD))
-build-prep-version-file: build prep-version-file
+build-prep: LLVM_TARGET = $(shell RUSTC_BOOTSTRAP=1 $(RUSTC_PRINT_TARGET_CMD) | $(JQ_TARGET_CMD))
+build-prep: build prep-version-file
 
 build-image-default: BASE_IMAGE_TYPE = debian
 build-image-default: IMAGE_NAME = jostho/$(APP_NAME):v$(APP_VERSION)
@@ -109,6 +109,6 @@ image-static: clean build-static prep-version-file build-image-static
 
 .PHONY: check check-required check-optional check-target-dir
 .PHONY: clean prep-version-file
-.PHONY: build build-static build-prep-version-file
+.PHONY: build build-static build-prep
 .PHONY: build-image-default build-image-static
 .PHONY: image image-static
