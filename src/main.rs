@@ -3,10 +3,11 @@ use clap::{App, Arg};
 use http::Response;
 use rand::distributions::Alphanumeric;
 use rand::{thread_rng, Rng};
+use std::env;
 use std::str;
 use std::thread;
 use std::time::Duration;
-use warp::Filter;
+use warp::{reply::Reply, Filter};
 
 const ARG_PORT: &str = "port";
 const ARG_LOCAL: &str = "local";
@@ -14,6 +15,8 @@ const HEADER_INPUT: &str = "X-Ghost-Input";
 const HEADER_CONTENT_TYPE: &str = "Content-Type";
 const CONTENT_LENGTH_LIMIT: u64 = 1024 * 64;
 const MAX_PORT: u16 = 32768;
+const ENV_RELEASE_FILE: &str = "GHOST_RELEASE";
+const DEFAULT_RELEASE_FILE: &str = "/usr/local/etc/ghost-release";
 
 #[tokio::main]
 async fn main() {
@@ -55,6 +58,18 @@ async fn main() {
     let version = warp::path("version")
         .and(warp::get())
         .map(|| clap::crate_version!());
+
+    // GET /release
+    let release_file = match env::var(ENV_RELEASE_FILE) {
+        Ok(val) => val,
+        Err(_e) => DEFAULT_RELEASE_FILE.to_string(),
+    };
+    let release = warp::path("release")
+        .and(warp::get())
+        .and(warp::fs::file(release_file))
+        .map(|reply: warp::filters::fs::File| {
+            warp::reply::with_header(reply, HEADER_CONTENT_TYPE, "text/plain").into_response()
+        });
 
     // GET /api
     let api_root = warp::path!("api" / ..);
@@ -117,6 +132,7 @@ async fn main() {
     );
     let routes = healthcheck
         .or(version)
+        .or(release)
         .or(api)
         .with(warp::log(clap::crate_name!()));
     warp::serve(routes).run((interface, port)).await;
