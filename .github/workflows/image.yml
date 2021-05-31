@@ -30,6 +30,8 @@ jobs:
         run: make --version
       - name: Run make check
         run: make check
+      - name: Login to ghcr
+        run: buildah login ghcr.io -u $GITHUB_ACTOR -p ${{ secrets.GITHUB_TOKEN }}
       - name: Build image
         run: make image
 
@@ -54,6 +56,6 @@ jobs:
       - name: Run make check
         run: make check
       - name: Login to ghcr
-        run: echo ${{ secrets.GITHUB_TOKEN }} | buildah login ghcr.io -u $GITHUB_ACTOR --password-stdin
+        run: buildah login ghcr.io -u $GITHUB_ACTOR -p ${{ secrets.GITHUB_TOKEN }}
       - name: Build static image
         run: make image-static
