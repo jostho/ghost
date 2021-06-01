@@ -68,7 +68,7 @@ check-target-dir:
 	test -d $(CURDIR)/target
 
 prep-version-file: check-target-dir
-	echo "$(APP_NAME) $(APP_VERSION) $(LLVM_TARGET)" > $(LOCAL_META_VERSION_PATH)
+	echo "$(APP_NAME) $(APP_VERSION) ($(GIT_COMMIT)) $(LLVM_TARGET)" > $(LOCAL_META_VERSION_PATH)
 	$(MAKE) -s check-required >> $(LOCAL_META_VERSION_PATH)
 
 # target for Containerfile
