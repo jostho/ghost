@@ -13,3 +13,4 @@ COPY --from=builder /usr/local/src/ghost/target/meta.version /usr/local/etc/ghos
 CMD ["/usr/local/bin/ghost"]
 EXPOSE 8000
 ENV RUST_LOG=info
+ENV GHOST_STATIC_DIR=/usr/local/share/ghost/static

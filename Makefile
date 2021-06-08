@@ -23,6 +23,7 @@ APP_OWNER := jostho
 
 IMAGE_BINARY_PATH := /usr/local/bin/$(APP_NAME)
 IMAGE_META_VERSION_PATH := /usr/local/etc/$(APP_NAME)-release
+IMAGE_SHARE_PATH := /usr/local/share
 PORT := 8000
 
 LOCAL_META_VERSION_PATH := $(CURDIR)/target/meta.version
@@ -98,6 +99,7 @@ build-image-static:
 		--cmd $(IMAGE_BINARY_PATH) \
 		--port $(PORT) \
 		--env RUST_LOG=info \
+		--env GHOST_STATIC_DIR=$(IMAGE_SHARE_PATH)/$(APP_NAME)/static \
 		-l app-name=$(APP_NAME) \
 		-l app-version=$(APP_VERSION) \
 		-l app-git-version=$(GIT_VERSION) \

@@ -10,12 +10,17 @@ use warp::{reply::Reply, Filter};
 
 const ARG_PORT: &str = "port";
 const ARG_LOCAL: &str = "local";
+const ARG_STATIC_DIR: &str = "static-dir";
+
 const HEADER_INPUT: &str = "X-Ghost-Input";
 const HEADER_CONTENT_TYPE: &str = "Content-Type";
 const CONTENT_LENGTH_LIMIT: u64 = 1024 * 64;
 const MAX_PORT: u16 = 32768;
+
 const ENV_RELEASE_FILE: &str = "GHOST_RELEASE";
 const DEFAULT_RELEASE_FILE: &str = "/usr/local/etc/ghost-release";
+const ENV_STATIC_DIR: &str = "GHOST_STATIC_DIR";
+const DEFAULT_STATIC_DIR: &str = "static";
 
 #[tokio::main]
 async fn main() {
@@ -32,6 +37,13 @@ async fn main() {
                 .validator(is_valid_port),
         )
         .arg(
+            Arg::with_name(ARG_STATIC_DIR)
+                .long(ARG_STATIC_DIR)
+                .env(ENV_STATIC_DIR)
+                .help("Static dir")
+                .default_value(DEFAULT_STATIC_DIR),
+        )
+        .arg(
             Arg::with_name(ARG_LOCAL)
                 .long(ARG_LOCAL)
                 .help("Bind on local interface")
@@ -42,6 +54,8 @@ async fn main() {
     // decide port
     let port = args.value_of(ARG_PORT).unwrap();
     let port = port.parse().unwrap();
+
+    let static_dir = args.value_of(ARG_STATIC_DIR).unwrap();
 
     // decide interface
     let interface = if args.is_present(ARG_LOCAL) {
@@ -66,9 +80,12 @@ async fn main() {
     let release = warp::path("release")
         .and(warp::get())
         .and(warp::fs::file(release_file))
-        .map(|reply: warp::filters::fs::File| {
+        .map(|reply: warp::fs::File| {
             warp::reply::with_header(reply, HEADER_CONTENT_TYPE, "text/plain").into_response()
         });
+
+    // GET /static
+    let static_root = warp::path("static").and(warp::fs::dir(static_dir.to_string()));
 
     // GET /api
     let api_root = warp::path!("api" / ..);
@@ -133,6 +150,7 @@ async fn main() {
     let routes = healthcheck
         .or(version)
         .or(release)
+        .or(static_root)
         .or(api)
         .with(warp::log(clap::crate_name!()));
     warp::serve(routes).run((interface, port)).await;
