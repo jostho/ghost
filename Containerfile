@@ -10,6 +10,7 @@ RUN make build-prep
 FROM docker.io/library/debian:10.9
 COPY --from=builder /usr/local/src/ghost/target/release/ghost /usr/local/bin
 COPY --from=builder /usr/local/src/ghost/target/meta.version /usr/local/etc/ghost-release
+COPY --from=builder /usr/local/src/ghost/target/meta.version /usr/local/share/ghost/static/meta.txt
 CMD ["/usr/local/bin/ghost"]
 EXPOSE 8000
 ENV RUST_LOG=info
