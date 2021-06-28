@@ -7,7 +7,7 @@ COPY . /usr/local/src/ghost
 RUN make build-prep
 
 # debian buster
-FROM docker.io/library/debian:10.9
+FROM docker.io/library/debian:10.10
 COPY --from=builder /usr/local/src/ghost/target/release/ghost /usr/local/bin
 COPY --from=builder /usr/local/src/ghost/target/meta.version /usr/local/etc/ghost-release
 COPY --from=builder /usr/local/src/ghost/target/meta.version /usr/local/share/ghost/static/meta.txt
