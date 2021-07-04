@@ -1,3 +1,4 @@
+use chrono::Local;
 use clap::{App, Arg};
 use http::Response;
 use rand::distributions::Alphanumeric;
@@ -147,12 +148,27 @@ async fn main() {
             .or(api_sleep)
             .or(api_post),
     );
+    let custom_log = warp::log::custom(|info| {
+        println!(
+            "{} - - {:?} \"{} {} {:?}\" {} \"{}\" \"{}\" \"{}\" {:?}",
+            info.remote_addr().unwrap().ip(),
+            Local::now(),
+            info.method(),
+            info.path(),
+            info.version(),
+            info.status().as_u16(),
+            info.referer().unwrap_or("-"),
+            info.user_agent().unwrap_or("-"),
+            info.host().unwrap_or("-"),
+            info.elapsed(),
+        );
+    });
     let routes = healthcheck
         .or(version)
         .or(release)
         .or(static_root)
         .or(api)
-        .with(warp::log(clap::crate_name!()));
+        .with(custom_log);
     warp::serve(routes).run((interface, port)).await;
 }
 
