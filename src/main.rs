@@ -1,5 +1,5 @@
 use chrono::Local;
-use clap::{App, Arg};
+use clap::Parser;
 use http::Response;
 use rand::distributions::Alphanumeric;
 use rand::{thread_rng, Rng};
@@ -8,10 +8,6 @@ use std::str;
 use std::thread;
 use std::time::Duration;
 use warp::{reply::Reply, Filter};
-
-const ARG_PORT: &str = "port";
-const ARG_LOCAL: &str = "local";
-const ARG_STATIC_DIR: &str = "static-dir";
 
 const HEADER_INPUT: &str = "X-Ghost-Input";
 const HEADER_CONTENT_TYPE: &str = "Content-Type";
@@ -23,43 +19,30 @@ const DEFAULT_RELEASE_FILE: &str = "/usr/local/etc/ghost-release";
 const ENV_STATIC_DIR: &str = "GHOST_STATIC_DIR";
 const DEFAULT_STATIC_DIR: &str = "static";
 
+/// Read cli args
+#[derive(Parser, Debug)]
+#[clap(version, about)]
+struct Args {
+    /// Port number to use
+    #[clap(short, long, value_parser, default_value_t = 8000, validator = is_valid_port)]
+    port: u16,
+
+    /// Static dir
+    #[clap(short, long, value_parser, env = ENV_STATIC_DIR, default_value = DEFAULT_STATIC_DIR)]
+    static_dir: String,
+
+    /// Bind on local interface
+    #[clap(short, long)]
+    local: bool,
+}
+
 #[tokio::main]
 async fn main() {
     pretty_env_logger::init();
-
-    let args = App::new(clap::crate_name!())
-        .about(clap::crate_description!())
-        .version(clap::crate_version!())
-        .arg(
-            Arg::with_name(ARG_PORT)
-                .long(ARG_PORT)
-                .help("Port number to use")
-                .default_value("8000")
-                .validator(is_valid_port),
-        )
-        .arg(
-            Arg::with_name(ARG_STATIC_DIR)
-                .long(ARG_STATIC_DIR)
-                .env(ENV_STATIC_DIR)
-                .help("Static dir")
-                .default_value(DEFAULT_STATIC_DIR),
-        )
-        .arg(
-            Arg::with_name(ARG_LOCAL)
-                .long(ARG_LOCAL)
-                .help("Bind on local interface")
-                .takes_value(false),
-        )
-        .get_matches();
-
-    // decide port
-    let port = args.value_of(ARG_PORT).unwrap();
-    let port = port.parse().unwrap();
-
-    let static_dir = args.value_of(ARG_STATIC_DIR).unwrap();
+    let args = Args::parse();
 
     // decide interface
-    let interface = if args.is_present(ARG_LOCAL) {
+    let interface = if args.local {
         [127, 0, 0, 1]
     } else {
         [0, 0, 0, 0] // default
@@ -71,7 +54,7 @@ async fn main() {
     // GET /version
     let version = warp::path("version")
         .and(warp::get())
-        .map(|| clap::crate_version!());
+        .map(|| env!("CARGO_PKG_VERSION") );
 
     // GET /release
     let release_file = match env::var(ENV_RELEASE_FILE) {
@@ -86,7 +69,7 @@ async fn main() {
         });
 
     // GET /static
-    let static_root = warp::path("static").and(warp::fs::dir(static_dir.to_string()));
+    let static_root = warp::path("static").and(warp::fs::dir(args.static_dir.to_string()));
 
     // GET /api
     let api_root = warp::path!("api" / ..);
@@ -169,10 +152,10 @@ async fn main() {
         .or(static_root)
         .or(api)
         .with(custom_log);
-    warp::serve(routes).run((interface, port)).await;
+    warp::serve(routes).run((interface, args.port)).await;
 }
 
-fn is_valid_port(val: String) -> Result<(), String> {
+fn is_valid_port(val: &str) -> Result<(), String> {
     let port: u16 = match val.parse() {
         Ok(port) => port,
         Err(e) => return Err(e.to_string()),
@@ -191,21 +174,21 @@ mod tests {
 
     #[test]
     fn is_valid_port_for_string() {
-        let result = is_valid_port("str".to_string());
+        let result = is_valid_port("str");
         assert!(result.is_err());
         assert_eq!(result.unwrap_err(), "invalid digit found in string");
     }
 
     #[test]
     fn is_valid_port_for_8000() {
-        let result = is_valid_port("8000".to_string());
+        let result = is_valid_port("8000");
         assert!(result.is_ok());
         assert_eq!(result.unwrap(), ());
     }
 
     #[test]
     fn is_valid_port_for_max_port() {
-        let result = is_valid_port(MAX_PORT.to_string());
+        let result = is_valid_port(&MAX_PORT.to_string());
         assert!(result.is_err());
         assert_eq!(
             result.unwrap_err(),
