@@ -54,7 +54,7 @@ async fn main() {
     // GET /version
     let version = warp::path("version")
         .and(warp::get())
-        .map(|| env!("CARGO_PKG_VERSION") );
+        .map(|| env!("CARGO_PKG_VERSION"));
 
     // GET /release
     let release_file = match env::var(ENV_RELEASE_FILE) {
