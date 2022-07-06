@@ -60,13 +60,20 @@ jobs:
       - name: Build static image
         run: make image-static
 
-  image-verify:
+  image-run:
 
     runs-on: ubuntu-latest
-    needs: [image-build, image-static-build]
+    needs: image-build
 
     steps:
       - name: Run image
-        uses: docker://ghcr.io/jostho/ghost:${GITHUB_SHA::7}
-        with:
-          args: "--version"
+        run: make run-image
+
+  image-static-run:
+
+    runs-on: ubuntu-latest
+    needs: image-static-build
+
+    steps:
+      - name: Run static image
+        run: make run-image-static
