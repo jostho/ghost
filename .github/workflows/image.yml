@@ -66,6 +66,8 @@ jobs:
     needs: image-build
 
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
       - name: Run image
         run: make run-image
 
@@ -75,5 +77,7 @@ jobs:
     needs: image-static-build
 
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
       - name: Run static image
         run: make run-image-static
