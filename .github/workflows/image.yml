@@ -11,7 +11,7 @@ env:
 
 jobs:
 
-  image-build:
+  image:
 
     runs-on: ubuntu-latest
 
@@ -35,7 +35,7 @@ jobs:
       - name: Build image
         run: make image
 
-  image-static-build:
+  image-static:
 
     runs-on: ubuntu-latest
 
@@ -60,10 +60,10 @@ jobs:
       - name: Build static image
         run: make image-static
 
-  image-run:
+  run-image:
 
     runs-on: ubuntu-latest
-    needs: image-build
+    needs: image
 
     steps:
       - name: Checkout code
@@ -71,10 +71,10 @@ jobs:
       - name: Run image
         run: make run-image
 
-  image-static-run:
+  run-image-static:
 
     runs-on: ubuntu-latest
-    needs: image-static-build
+    needs: image-static
 
     steps:
       - name: Checkout code
