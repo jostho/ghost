@@ -120,7 +120,7 @@ verify-image:
 run-container: verify-image
 	$(PODMAN) run -d -p $(PORT):$(PORT) $(IMAGE_NAME)
 	sleep 10
-	$(CURL) -f -i -m 10 $(RELEASE_URL)
+	$(CURL) -fsS -i -m 10 $(RELEASE_URL)
 	$(PODMAN) stop -l
 
 push-image:
