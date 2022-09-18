@@ -84,23 +84,24 @@ build-prep-static: build-static prep-version-file
 build-image:
 	$(BUILDAH) bud \
 		--tag $(IMAGE_NAME) \
-		--build-arg TARGET=$(TARGET) \
+		--build-arg TARGET=$(LLVM_TARGET) \
 		--label app-name=$(APP_NAME) \
 		--label app-version=$(APP_VERSION) \
 		--label app-git-version=$(GIT_VERSION) \
 		--label app-arch=$(ARCH) \
 		--label app-base-image=$(BASE_IMAGE) \
+		--label app-llvm-target=$(LLVM_TARGET) \
 		--label org.opencontainers.image.source=$(APP_REPOSITORY) \
 		-f $(CONTAINER_FILE) .
 
 build-image-default: BASE_IMAGE = debian
 build-image-default: CONTAINER_FILE = Containerfile
-build-image-default: TARGET = default
+build-image-default: LLVM_TARGET = $(shell RUSTC_BOOTSTRAP=1 $(RUSTC_PRINT_TARGET_CMD) | $(JQ_TARGET_CMD))
 build-image-default: build-image
 
 build-image-static: BASE_IMAGE = scratch
 build-image-static: CONTAINER_FILE = Containerfile.static
-build-image-static: TARGET = $(TARGET_MUSL)
+build-image-static: LLVM_TARGET = $(shell RUSTC_BOOTSTRAP=1 $(RUSTC_PRINT_TARGET_CMD) --target $(TARGET_MUSL) | $(JQ_TARGET_CMD))
 build-image-static: build-image
 
 verify-image:
