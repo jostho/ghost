@@ -63,44 +63,41 @@ clean:
 build:
 	$(CARGO) build --release
 
-build-static:
-	$(CARGO) build --release --target $(TARGET_MUSL)
+build-for-target:
+	$(CARGO) build --release --target $(TARGET)
+
+build-static: TARGET = $(TARGET_MUSL)
+build-static: build-for-target
 
 check-target-dir:
 	test -d $(CURDIR)/target
 
 prep-version-file: check-target-dir
-	echo "$(APP_NAME) $(APP_VERSION) ($(GIT_COMMIT)) $(LLVM_TARGET)" > $(LOCAL_META_VERSION_PATH)
+	echo "$(APP_NAME) $(APP_VERSION) ($(GIT_COMMIT)) $(TARGET)" > $(LOCAL_META_VERSION_PATH)
 	$(MAKE) -s check-required >> $(LOCAL_META_VERSION_PATH)
 
 # target for Containerfile
-build-prep: LLVM_TARGET = $(shell RUSTC_BOOTSTRAP=1 $(RUSTC_PRINT_TARGET_CMD) | $(JQ_TARGET_CMD))
-build-prep: build prep-version-file
-
-# target for Containerfile.static
-build-prep-static: LLVM_TARGET = $(shell RUSTC_BOOTSTRAP=1 $(RUSTC_PRINT_TARGET_CMD) --target $(TARGET_MUSL) | $(JQ_TARGET_CMD))
-build-prep-static: build-static prep-version-file
+build-prep: build-for-target prep-version-file
 
 build-image:
 	$(BUILDAH) bud \
 		--tag $(IMAGE_NAME) \
+		--build-arg BASE_IMAGE=$(BASE_IMAGE) \
 		--build-arg TARGET=$(LLVM_TARGET) \
 		--label app-name=$(APP_NAME) \
 		--label app-version=$(APP_VERSION) \
 		--label app-git-version=$(GIT_VERSION) \
-		--label app-arch=$(ARCH) \
+		--label app-build-arch=$(ARCH) \
 		--label app-base-image=$(BASE_IMAGE) \
 		--label app-llvm-target=$(LLVM_TARGET) \
 		--label org.opencontainers.image.source=$(APP_REPOSITORY) \
-		-f $(CONTAINER_FILE) .
+		-f Containerfile .
 
-build-image-default: BASE_IMAGE = debian
-build-image-default: CONTAINER_FILE = Containerfile
+build-image-default: BASE_IMAGE = docker.io/library/debian:11
 build-image-default: LLVM_TARGET = $(shell RUSTC_BOOTSTRAP=1 $(RUSTC_PRINT_TARGET_CMD) | $(JQ_TARGET_CMD))
 build-image-default: build-image
 
 build-image-static: BASE_IMAGE = scratch
-build-image-static: CONTAINER_FILE = Containerfile.static
 build-image-static: LLVM_TARGET = $(shell RUSTC_BOOTSTRAP=1 $(RUSTC_PRINT_TARGET_CMD) --target $(TARGET_MUSL) | $(JQ_TARGET_CMD))
 build-image-static: build-image
 
@@ -134,7 +131,8 @@ run-image-static: run-container
 
 .PHONY: check check-required check-optional check-target-dir
 .PHONY: clean prep-version-file
-.PHONY: build build-static build-prep build-prep-static
+.PHONY: build build-static
+.PHONY: build-for-target build-prep
 .PHONY: build-image build-image-default build-image-static
 .PHONY: verify-image push-image
 .PHONY: image image-static
