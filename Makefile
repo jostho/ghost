@@ -93,7 +93,7 @@ build-image:
 		--label org.opencontainers.image.source=$(APP_REPOSITORY) \
 		-f Containerfile .
 
-build-image-default: BASE_IMAGE = docker.io/library/debian:11
+build-image-default: BASE_IMAGE = docker.io/library/debian:12
 build-image-default: LLVM_TARGET = $(shell RUSTC_BOOTSTRAP=1 $(RUSTC_PRINT_TARGET_CMD) | $(JQ_TARGET_CMD))
 build-image-default: build-image
 
