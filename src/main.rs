@@ -21,18 +21,18 @@ const DEFAULT_STATIC_DIR: &str = "static";
 
 /// Read cli args
 #[derive(Parser, Debug)]
-#[clap(version, about)]
+#[command(author, version, about, long_about = None)]
 struct Args {
     /// Port number to use
-    #[clap(short, long, value_parser, default_value_t = 8000, validator = is_valid_port)]
+    #[arg(short, long, value_parser = is_valid_port, default_value_t = 8000)]
     port: u16,
 
     /// Static dir
-    #[clap(short, long, value_parser, env = ENV_STATIC_DIR, default_value = DEFAULT_STATIC_DIR)]
+    #[arg(short, long, value_parser, env = ENV_STATIC_DIR, default_value = DEFAULT_STATIC_DIR)]
     static_dir: String,
 
     /// Bind on local interface
-    #[clap(short, long)]
+    #[arg(short, long)]
     local: bool,
 }
 
@@ -155,14 +155,14 @@ async fn main() {
     warp::serve(routes).run((interface, args.port)).await;
 }
 
-fn is_valid_port(val: &str) -> Result<(), String> {
+fn is_valid_port(val: &str) -> Result<u16, String> {
     let port: u16 = match val.parse() {
         Ok(port) => port,
         Err(e) => return Err(e.to_string()),
     };
 
     if port < MAX_PORT {
-        Ok(())
+        Ok(port)
     } else {
         Err(format!("value should be less than {}", MAX_PORT))
     }
@@ -183,7 +183,7 @@ mod tests {
     fn is_valid_port_for_8000() {
         let result = is_valid_port("8000");
         assert!(result.is_ok());
-        assert_eq!(result.unwrap(), ());
+        assert_eq!(result.unwrap(), 8000);
     }
 
     #[test]
