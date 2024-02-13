@@ -10,7 +10,7 @@ This can be used to simulate http responses.
 
 * fedora 39
 * rustup 1.26
-* rust 1.73
+* rust 1.76
 * make 4.4
 
 ## Build
