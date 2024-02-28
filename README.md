@@ -1,7 +1,7 @@
 # Ghost
 
-![CI](https://github.com/jostho/ghost/workflows/CI/badge.svg)
-![Image](https://github.com/jostho/ghost/workflows/Image/badge.svg)
+![CI](https://github.com/jostho/ghost/actions/workflows/ci.yml/badge.svg)
+![Image](https://github.com/jostho/ghost/actions/workflows/image.yml/badge.svg)
 
 This is an echo server written in rust using [warp](https://github.com/seanmonstar/warp).
 This can be used to simulate http responses.
