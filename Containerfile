@@ -1,7 +1,7 @@
 ARG BASE_IMAGE
 
 # rust builder
-FROM docker.io/library/rust:1.79 as builder
+FROM docker.io/library/rust:1.81 as builder
 ARG TARGET
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get -y -qq update && apt-get -y -qq install jq
